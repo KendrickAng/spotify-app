@@ -1,7 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/KendrickAng/spotify-app/cmd/api/healthcheck"
+)
+
+const API_VERSION = 1
 
 func main() {
-	fmt.Println("Hello world!")
+	http.HandleFunc(fmt.Sprintf("/v%d/healthcheck", API_VERSION), healthcheck.HealthCheck)
+
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
