@@ -43,17 +43,16 @@ func (s *Spotify) Init() error {
 	if err != nil {
 		return err
 	}
-	req.Header.Add("Authorization", "Basic: " + base64.StdEncoding.EncodeToString(
+	req.Header.Add("Authorization", "Basic " + base64.StdEncoding.EncodeToString(
 		[]byte(s.cfg.ClientID + ":" + s.cfg.ClientSecret),
 	))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return errors.New("non-200 response when getting access token")
+		return errors.New("non-200 response when getting access token, got: " + resp.Status)
 	}
 
 	creds := ClientCredentialsResp{}
