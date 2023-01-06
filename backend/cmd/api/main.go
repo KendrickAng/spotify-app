@@ -41,4 +41,6 @@ func main() {
 	http.HandleFunc(fmt.Sprintf("/v%d/songs/generate", API_VERSION), songs.GenerateHandler(spotify))
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
+
+	// TODO graceful exit
 }

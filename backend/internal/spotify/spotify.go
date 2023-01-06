@@ -124,6 +124,7 @@ func NewSpotify(cfg config.Config) (Spotify, error) {
 	}, nil
 }
 
+// refreshes the access token for the spotify api
 func (s *Spotify) Init() error {
 	data := url.Values{}
 	data.Set("grant_type", "client_credentials")
@@ -160,18 +161,24 @@ func (s *Spotify) Init() error {
 	return nil
 }
 
-func (s *Spotify) Search(query string, types []string, limit int, offset int) (Tracks, error) {
+func (s *Spotify) Search(query string, types []string, limit int, offset int) (SearchResp, error) {
 	// sanity checking
 	if offset < SearchMinOffset || offset > SearchMaxOffset {
-		return Tracks{}, errors.New("invalid offset: 0 <= offset <= 1000")
+		return SearchResp{}, errors.New("invalid offset: 0 <= offset <= 1000")
 	}
 	if limit < SearchMinLimit || limit > SearchMaxLimit {
-		return Tracks{}, errors.New("invalid limit: 0 <= limit <= 50")
+		return SearchResp{}, errors.New("invalid limit: 0 <= limit <= 50")
+	}
+
+	// refresh access token if expired
+	if time.Now().After(s.ExpiresAt) {
+		log.Println("refreshing access token")
+		s.Init()
 	}
 
 	req, err := http.NewRequest("GET", searchEp, nil)
 	if err != nil {
-		return Tracks{}, err
+		return SearchResp{}, err
 	}
 	params := url.Values{}
 	for _, typ := range types {
@@ -182,22 +189,22 @@ func (s *Spotify) Search(query string, types []string, limit int, offset int) (T
 	params.Add("offset", strconv.Itoa(offset))
 	params.Add("q", query)
 	req.URL.RawQuery = params.Encode()
+	req.Header.Add("Authorization", "Bearer "+s.AccessToken)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return Tracks{}, err
+		return SearchResp{}, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return Tracks{}, errors.New("non-200 response when searching, got: " + resp.Status)
+		return SearchResp{}, errors.New("non-200 response when searching, got: " + resp.Status)
 	}
 
-	tracks := Tracks{}
-	err = json.NewDecoder(resp.Body).Decode(&tracks)
+	sResp := SearchResp{}
+	err = json.NewDecoder(resp.Body).Decode(&sResp)
 	if err != nil {
-		return Tracks{}, err
+		return SearchResp{}, err
 	}
-	log.Println(json.MarshalIndent(tracks, "", "  "))
 
-	return tracks, nil
+	return sResp, nil
 }

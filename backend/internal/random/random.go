@@ -7,8 +7,8 @@ import (
 
 const LettersLower = "abcdefghijklmnopqrstuvwxyz"
 const LettersUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-var Letters = LettersLower + LettersUpper
 
+var Letters = LettersLower + LettersUpper
 
 func RandomAlphabet() string {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -18,5 +18,5 @@ func RandomAlphabet() string {
 func RandomInt(aInc int, bInc int) int {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	// shift the range to [0, n) to use with Intn, then add back the offset
-	return r.Intn(bInc - aInc) + aInc
+	return r.Intn(bInc-aInc) + aInc
 }
