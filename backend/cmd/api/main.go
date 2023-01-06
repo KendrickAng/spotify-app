@@ -24,16 +24,20 @@ func main() {
 		log.Fatalln("CLIENT_SECRET is not set")
 	}
 
-	cfg := config.Config{
-		ClientID: cid,
+	spotify, err := spotify.NewSpotify(config.Config{
+		ClientID:     cid,
 		ClientSecret: cs,
-	}
-	spotify, err := spotify.NewSpotify(cfg)
+	})
 	if err != nil {
-		log.Fatalln("Failed to start spotify API")
+		log.Fatalln(err)
+	}
+	err = spotify.Init()
+	if err != nil {
+		log.Fatalln(err)
 	}
 
 	http.HandleFunc(fmt.Sprintf("/v%d/healthcheck", API_VERSION), healthcheck.HealthCheckHandler)
+	// TODO: rate limiting
 	http.HandleFunc(fmt.Sprintf("/v%d/songs/generate", API_VERSION), songs.GenerateHandler(spotify))
 
 	log.Fatal(http.ListenAndServe(":8080", nil))

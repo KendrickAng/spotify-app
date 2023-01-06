@@ -1,7 +1,6 @@
-
 package config
 
 type Config struct {
-	ClientID string
+	ClientID     string
 	ClientSecret string
 }
