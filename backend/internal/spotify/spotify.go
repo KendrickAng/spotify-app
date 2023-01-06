@@ -17,6 +17,9 @@ import (
 const authEp = `https://accounts.spotify.com/api/token`
 const searchEp = `https://api.spotify.com/v1/search`
 
+const SearchMinOffset = 0
+const SearchMaxOffset = 1000
+
 type Spotify struct {
 	cfg         config.Config
 	AccessToken string
@@ -136,6 +139,7 @@ func (s *Spotify) Init() error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		return errors.New("non-200 response when getting access token, got: " + resp.Status)
 	}
@@ -155,6 +159,14 @@ func (s *Spotify) Init() error {
 }
 
 func (s *Spotify) Search(query string, types []string, limit int, offset int) (Tracks, error) {
+	// sanity checking
+	if offset < 0 || offset > 1000 {
+		return Tracks{}, errors.New("invalid offset: 0 <= offset <= 1000")
+	}
+	if limit < 0 || limit > 50 {
+		return Tracks{}, errors.New("invalid limit: 0 <= limit <= 50")
+	}
+
 	req, err := http.NewRequest("GET", searchEp, nil)
 	if err != nil {
 		return Tracks{}, err
@@ -173,6 +185,7 @@ func (s *Spotify) Search(query string, types []string, limit int, offset int) (T
 	if err != nil {
 		return Tracks{}, err
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		return Tracks{}, errors.New("non-200 response when searching, got: " + resp.Status)
 	}
