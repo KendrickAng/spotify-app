@@ -19,6 +19,8 @@ const searchEp = `https://api.spotify.com/v1/search`
 
 const SearchMinOffset = 0
 const SearchMaxOffset = 1000
+const SearchMinLimit = 0
+const SearchMaxLimit = 50
 
 type Spotify struct {
 	cfg         config.Config
@@ -160,10 +162,10 @@ func (s *Spotify) Init() error {
 
 func (s *Spotify) Search(query string, types []string, limit int, offset int) (Tracks, error) {
 	// sanity checking
-	if offset < 0 || offset > 1000 {
+	if offset < SearchMinOffset || offset > SearchMaxOffset {
 		return Tracks{}, errors.New("invalid offset: 0 <= offset <= 1000")
 	}
-	if limit < 0 || limit > 50 {
+	if limit < SearchMinLimit || limit > SearchMaxLimit {
 		return Tracks{}, errors.New("invalid limit: 0 <= limit <= 50")
 	}
 
