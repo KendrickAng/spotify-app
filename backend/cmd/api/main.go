@@ -8,23 +8,25 @@ import (
 
 	"github.com/KendrickAng/spotify-app/cmd/api/healthcheck"
 	"github.com/KendrickAng/spotify-app/cmd/api/songs"
-	"github.com/KendrickAng/spotify-app/internal/config"
 	"github.com/KendrickAng/spotify-app/internal/spotify"
 )
 
 const API_VERSION = 1
 
-func main() {
-	cid, isSet := os.LookupEnv("CLIENT_ID")
+func lookupEnvFailFast(key string) string {
+	key, isSet := os.LookupEnv(key)
 	if !isSet {
-		log.Fatalln("CLIENT_ID is not set")
+		log.Fatalf("%s is not set\n", key)
 	}
-	cs, isSet := os.LookupEnv("CLIENT_SECRET")
-	if !isSet {
-		log.Fatalln("CLIENT_SECRET is not set")
-	}
+	return key
+}
 
-	spotify, err := spotify.NewSpotify(config.Config{
+func main() {
+	cid := lookupEnvFailFast("CLIENT_ID")
+	cs := lookupEnvFailFast("CLIENT_SECRET")
+	cUrl := lookupEnvFailFast("CLIENT_URL")
+
+	spotify, err := spotify.NewSpotify(spotify.Config{
 		ClientID:     cid,
 		ClientSecret: cs,
 	})
@@ -36,9 +38,18 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	http.HandleFunc(fmt.Sprintf("/v%d/healthcheck", API_VERSION), healthcheck.HealthCheckHandler)
+	http.HandleFunc(fmt.Sprintf("/v%d/healthcheck", API_VERSION), healthcheck.HealthCheckHandler(
+		healthcheck.Config{
+			ClientUrl: cUrl,
+		},
+	))
 	// TODO: rate limiting
-	http.HandleFunc(fmt.Sprintf("/v%d/songs/generate", API_VERSION), songs.GenerateHandler(spotify))
+	http.HandleFunc(fmt.Sprintf("/v%d/songs/generate", API_VERSION), songs.GenerateHandler(
+		songs.Config{
+			ClientUrl: cUrl,
+		},
+		spotify,
+	))
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 

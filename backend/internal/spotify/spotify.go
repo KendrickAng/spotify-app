@@ -10,8 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/KendrickAng/spotify-app/internal/config"
 )
 
 const authEp = `https://accounts.spotify.com/api/token`
@@ -22,8 +20,13 @@ const SearchMaxOffset = 1000
 const SearchMinLimit = 0
 const SearchMaxLimit = 50
 
+type Config struct {
+	ClientID     string
+	ClientSecret string
+}
+
 type Spotify struct {
-	cfg         config.Config
+	cfg         Config
 	AccessToken string
 	ExpiresAt   time.Time
 }
@@ -116,7 +119,7 @@ type ExternalUrls struct {
 	Spotify string `json:"spotify"`
 }
 
-func NewSpotify(cfg config.Config) (Spotify, error) {
+func NewSpotify(cfg Config) (Spotify, error) {
 	return Spotify{
 		cfg:         cfg,
 		AccessToken: "",
