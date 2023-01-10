@@ -16,10 +16,32 @@ type Config struct {
 
 type GenerateResp struct {
 	Error  string
-	Tracks *spotify.Tracks
+	Tracks []Track
 }
 
-func jsonResponse(err error, tracks *spotify.Tracks) []byte {
+type Track struct {
+	Id string
+	Name string
+	Album Album
+	Uri string
+	ExternalUrl string
+}
+
+type Album struct {
+	Id string
+	Name string
+	Images []Image
+	Uri string
+	ExternalUrl string
+}
+
+type Image struct {
+	Height int
+	Width int
+	Url string
+}
+
+func jsonResponse(err error, tracks []Track) []byte {
 	if tracks == nil {
 		return []byte{}
 	}
@@ -40,6 +62,36 @@ func jsonResponse(err error, tracks *spotify.Tracks) []byte {
 	return bytes
 }
 
+func tracks(t *spotify.Tracks) []Track {
+	tracks := make([]Track, len(t.Items))
+	for i, item := range t.Items {
+		// extract album iamges
+		images := []Image{}
+		for _, image := range item.Album.Images {
+			images = append(images, Image{
+				Height: image.Height,
+				Width: image.Width,
+				Url: image.Url,
+			})
+		}
+		// extract essential track info
+		tracks[i] = Track{
+			Id: item.Id,
+			Name: item.Name,
+			Uri: item.Uri,
+			ExternalUrl: item.ExternalUrls.Spotify,
+			Album: Album{
+				Id: item.Album.Id,
+				Name: item.Album.Name,
+				Uri: item.Album.Uri,
+				ExternalUrl: item.Album.ExternalUrls.Spotify,
+				Images: images,
+			},
+		}
+	}
+	return tracks
+}
+
 func GenerateHandler(cfg Config, s spotify.Spotify) func(http.ResponseWriter, *http.Request) {
 	// generate the search query params
 	query := fmt.Sprintf("*%s*", random.RandomAlphabet())
@@ -58,6 +110,6 @@ func GenerateHandler(cfg Config, s spotify.Spotify) func(http.ResponseWriter, *h
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write(jsonResponse(nil, &res.Tracks))
+		w.Write(jsonResponse(nil, tracks(&res.Tracks)))
 	}
 }
