@@ -15,30 +15,30 @@ type Config struct {
 }
 
 type GenerateResp struct {
-	Error  string
-	Tracks []Track
+	Error  string `json:"error"`
+	Tracks []Track `json:"tracks"`
 }
 
 type Track struct {
-	Id string
-	Name string
-	Album Album
-	Uri string
-	ExternalUrl string
+	Id string `json:"id"`
+	Name string	`json:"name"`
+	Album Album `json:"album"`
+	Uri string	`json:"uri"`
+	ExternalUrl string	`json:"external_url"`
 }
 
 type Album struct {
-	Id string
-	Name string
-	Images []Image
-	Uri string
-	ExternalUrl string
+	Id string	`json:"id"`
+	Name string	`json:"name"`
+	Images []Image	`json:"images"`
+	Uri string	`json:"uri"`
+	ExternalUrl string	`json:"external_url"`
 }
 
 type Image struct {
-	Height int
-	Width int
-	Url string
+	Height int	`json:"height"`
+	Width int	`json:"width"`
+	Url string	`json:"url"`
 }
 
 func jsonResponse(err error, tracks []Track) []byte {
@@ -93,16 +93,17 @@ func tracks(t *spotify.Tracks) []Track {
 }
 
 func GenerateHandler(cfg Config, s spotify.Spotify) func(http.ResponseWriter, *http.Request) {
-	// generate the search query params
-	query := fmt.Sprintf("*%s*", random.RandomAlphabet())
-	types := []string{"track"}
-	limit := 10
-	offset := random.RandomInt(spotify.SearchMinOffset, spotify.SearchMaxOffset)
-
-	log.Printf("q: '%v', types: %v, limit: %v, offset: %v\n", query, types, limit, offset)
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", cfg.ClientUrl)
+
+		// generate the search query params
+		query := fmt.Sprintf("*%s*", random.RandomAlphabet())
+		types := []string{"track"}
+		limit := 10
+		offset := random.RandomInt(spotify.SearchMinOffset, spotify.SearchMaxOffset)
+	
+		log.Printf("q: '%v', types: %v, limit: %v, offset: %v\n", query, types, limit, offset)
+	
 		res, err := s.Search(query, types, limit, offset)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
