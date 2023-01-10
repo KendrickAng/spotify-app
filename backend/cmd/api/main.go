@@ -14,11 +14,11 @@ import (
 const API_VERSION = 1
 
 func lookupEnvFailFast(key string) string {
-	key, isSet := os.LookupEnv(key)
+	val, isSet := os.LookupEnv(key)
 	if !isSet {
 		log.Fatalf("%s is not set\n", key)
 	}
-	return key
+	return val
 }
 
 func main() {
