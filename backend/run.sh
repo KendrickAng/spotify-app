@@ -9,4 +9,5 @@ while read line; do
 done < $filename
 
 echo "starting server"
-go run cmd/api/main.go
+go build -o bin/ cmd/api/main.go
+bin/main
