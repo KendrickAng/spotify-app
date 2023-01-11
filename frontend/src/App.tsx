@@ -50,41 +50,69 @@ const fetchHealth = async () => {
 };
 
 const App: Component = () => {
-  const [songs, { refetch }] = createResource(fetchSongs);
+  const [songsSignal, setSongsSignal] = createSignal(false);
+  const [songs, { refetch }] = createResource(songsSignal, fetchSongs);
   const [health] = createResource(fetchHealth);
 
+  const onGenerateClick = () => {
+    if (!songsSignal()) {
+      setSongsSignal(true);
+    } else {
+      refetch();
+    }
+  };
+
   return (
-    <div>
-      <div>{"Health: " + health()}</div>
-      <h1>spotify</h1>
-      <p>song picker</p>
-      <div>
-        <button onClick={() => refetch()}>generate</button>
+    <div class={styles.App}>
+      <div class={styles.header}>
+        <img src="/src/assets/spotify_logo_green_500.png" alt="spotiy logo"/>
       </div>
-      <div>
-        <a href={GITHUB_LINK}>github</a>
+      <div class={styles.center}>
+        <div class={styles.subheader}>
+          song picker
+        </div>
       </div>
-      <Switch fallback={<p>Click "Generate" to find songs!</p>}>
-        <Match when={songs && songs.loading}>
-          Loading...
-        </Match>
-        <Match when={songs && songs.error}>
-          <div>Sorry, we met an issue fetching songs... please try again later!</div>
-          <div>The following error occured: {songs.error}</div>
-        </Match>
-        <Match when={songs && songs()}>
-          <ol>
-            <For each={songs().tracks}>
-              {(track, i) =>
-                <li>
-                  <div>{i}</div>
-                  <div>{track.name}</div>
-                </li>
-              }
-            </For>
-          </ol>
-        </Match>
-      </Switch>
+      
+      <div class={styles.center}>
+        <div class={styles.socials}>
+          <a href={GITHUB_LINK}>github</a>
+        </div>
+      </div>
+
+      <Show when={health()}
+        fallback={<button disabled>Service Unavailable</button>}
+      >
+        <div class={styles.center}>
+          <button class={styles.generate} onClick={onGenerateClick}>
+            generate
+          </button>
+        </div>
+      </Show>
+
+      <div class={styles.results}>
+        <Switch fallback={<p class={styles.reminder}>Click "Generate" to find songs!</p>}>
+          <Match when={songs && songs.loading}>
+            <div class={styles.reminder}>
+              Loading...
+            </div>
+          </Match>
+          <Match when={songs && songs.error}>
+            <div class={styles.reminder}>
+              <div>Sorry, we met an issue fetching songs... please try again later!</div>
+              <div>The following error occured: {songs.error}</div>
+            </div>
+          </Match>
+          <Match when={songs && songs()}>
+            <div class={styles.center}>
+              <For each={songs().tracks}>
+                {(track, i) =>
+                  <div class={styles.track}>{track.name}</div>
+                }
+              </For>
+            </div>
+          </Match>
+        </Switch>
+      </div>
     </div>
   );
 };
