@@ -46,8 +46,8 @@ type Image = {
 const EMPTY_IMAGE = {
   height: 64,
   width: 64,
-  url: "https://via.placeholder.com/64"
-}
+  url: "https://via.placeholder.com/64",
+};
 
 const fetchSongs = async () => {
   const url = import.meta.env.VITE_SERVER_URL + "/songs/generate";
@@ -125,17 +125,30 @@ const App: Component = () => {
             <div class={styles.center}>
               <For each={songs().tracks}>
                 {(track: Track) => {
-                  const { url: imageUrl } = track.album.images.find(({ height }) => height > 100) || EMPTY_IMAGE;
-
-                  console.log(track);
+                  const { url: imageUrl } =
+                    track.album.images.find(({ height }) => height > 100) ||
+                    EMPTY_IMAGE;
                   return (
                     <div class={styles.track}>
-                      <img class={styles.trackImage} height={150} src={imageUrl} alt="album image" />
+                      <img
+                        class={styles.trackImage}
+                        height={150}
+                        src={imageUrl}
+                        alt="album image"
+                      />
                       <div class={styles.trackContent}>
                         <div>{track.name}</div>
                         <div>Popularity: {track.popularity}</div>
-                        <div><a target="_blank" href={track.external_url}>Song Link</a></div>
-                        <div><a target="_blank" href={track.preview_url}>Song Preview</a></div>
+                        <div>
+                          <a target="_blank" href={track.external_url}>
+                            Song Link
+                          </a>
+                        </div>
+                        <div>
+                          <a target="_blank" href={track.preview_url}>
+                            Song Preview
+                          </a>
+                        </div>
                       </div>
                     </div>
                   );
