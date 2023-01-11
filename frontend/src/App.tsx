@@ -50,7 +50,8 @@ const EMPTY_IMAGE = {
 };
 
 const fetchSongs = async () => {
-  const url = import.meta.env.VITE_SERVER_URL + "/songs/generate";
+  const url = import.meta.env.VITE_SERVER_URL + "/v1/songs/generate";
+  console.log(url);
   const res = await fetch(url, {
     method: "GET",
   });
@@ -58,7 +59,8 @@ const fetchSongs = async () => {
 };
 
 const fetchHealth = async () => {
-  const url = import.meta.env.VITE_SERVER_URL + "/healthcheck";
+  const url = import.meta.env.VITE_SERVER_URL + "/v1/healthcheck";
+  console.log(url);
   const res = await fetch(url, {
     method: "GET",
   });
@@ -97,16 +99,16 @@ const App: Component = () => {
         </div>
       </div>
 
-      <Show
-        when={health()}
-        fallback={<button disabled>Service Unavailable</button>}
-      >
-        <div class={styles.center}>
-          <button class={styles.generate} onClick={onGenerateClick}>
-            generate
-          </button>
-        </div>
-      </Show>
+      <div class={styles.center}>
+        <Show
+          when={health()}
+          fallback={<button disabled>Service Unavailable</button>}
+        >
+            <button class={styles.generate} onClick={onGenerateClick}>
+              generate
+            </button>
+        </Show>
+      </div>
 
       <div class={styles.results}>
         <Switch

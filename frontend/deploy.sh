@@ -12,18 +12,19 @@ cd dist
 # place .nojekyll to bypass Jekyll processing
 echo > .nojekyll
 
+# go to /frontend
+cd ..
+
 # if you are deploying to a custom domain
 # echo 'www.example.com' > CNAME
 
-git init
-git checkout -B main
-git add -A
-git commit -m 'deploy'
+# git init
+# git checkout -B main
+git add dist -f
+git commit -m 'deploy with dist'
 
-# if you are deploying to https://<USERNAME>.github.io
-# git push -f git@github.com:<USERNAME>/<USERNAME>.github.io.git main
+# go to the top level
+cd ..
 
-# if you are deploying to https://<USERNAME>.github.io/<REPO>
-git push -f git@github.com:KendrickAng/spotify-app.git main:gh-pages
-
-cd -
+# push to gh-pages branch to trigger the deployment
+git subtree push --prefix frontend/dist origin gh-pages
