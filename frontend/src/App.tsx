@@ -65,6 +65,10 @@ const fetchHealth = async () => {
   return await res.text();
 };
 
+const assetUrl = (filename: string) => {
+  return new URL(`/src/assets/${filename}`, import.meta.url).href
+}
+
 const App: Component = () => {
   const [songsSignal, setSongsSignal] = createSignal(false);
   const [songs, { refetch }] = createResource(songsSignal, fetchSongs);
@@ -81,7 +85,7 @@ const App: Component = () => {
   return (
     <>
       <div class={styles.header}>
-        <img src="/src/assets/spotify_logo_green_500.png" alt="spotiy logo" />
+        <img src={assetUrl("spotify_logo_green_500.png")} alt="spotify logo" />
       </div>
       <div class={styles.center}>
         <div class={styles.subheader}>song picker</div>
