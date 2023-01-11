@@ -25,6 +25,8 @@ type Track struct {
 	Album Album `json:"album"`
 	Uri string	`json:"uri"`
 	ExternalUrl string	`json:"external_url"`
+	PreviewUrl string `json:"preview_url"`
+	Popularity int `json:"popularity"`
 }
 
 type Album struct {
@@ -87,6 +89,8 @@ func tracks(t *spotify.Tracks) []Track {
 				ExternalUrl: item.Album.ExternalUrls.Spotify,
 				Images: images,
 			},
+			Popularity: item.Popularity,
+			PreviewUrl: item.PreviewUrl,
 		}
 	}
 	return tracks

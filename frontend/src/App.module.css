@@ -2,9 +2,8 @@
   box-sizing: border-box;
 }
 
-.App {
+body {
   background-color: #282c34;
-  min-height: 100vh;
 }
 
 /* .logo {
@@ -88,6 +87,21 @@
 }
 
 .track {
-  background-color: white;
+  display: flex;
+  background-color: #68eb96;
   margin: 8px;
+  border: 1px solid #1ed760;
+  border-radius: 4px;
+  width: 700px;
+}
+
+.trackImage {
+  display: block;
+  border-radius: 4px;
+  border: 2px solid #fff;
+}
+
+.trackContent {
+  padding: 8px;
+
 }
