@@ -15,32 +15,32 @@ type Config struct {
 }
 
 type GenerateResp struct {
-	Error  string `json:"error"`
+	Error  string  `json:"error"`
 	Tracks []Track `json:"tracks"`
 }
 
 type Track struct {
-	Id string `json:"id"`
-	Name string	`json:"name"`
-	Album Album `json:"album"`
-	Uri string	`json:"uri"`
-	ExternalUrl string	`json:"external_url"`
-	PreviewUrl string `json:"preview_url"`
-	Popularity int `json:"popularity"`
+	Id          string `json:"id"`
+	Name        string `json:"name"`
+	Album       Album  `json:"album"`
+	Uri         string `json:"uri"`
+	ExternalUrl string `json:"external_url"`
+	PreviewUrl  string `json:"preview_url"`
+	Popularity  int    `json:"popularity"`
 }
 
 type Album struct {
-	Id string	`json:"id"`
-	Name string	`json:"name"`
-	Images []Image	`json:"images"`
-	Uri string	`json:"uri"`
-	ExternalUrl string	`json:"external_url"`
+	Id          string  `json:"id"`
+	Name        string  `json:"name"`
+	Images      []Image `json:"images"`
+	Uri         string  `json:"uri"`
+	ExternalUrl string  `json:"external_url"`
 }
 
 type Image struct {
-	Height int	`json:"height"`
-	Width int	`json:"width"`
-	Url string	`json:"url"`
+	Height int    `json:"height"`
+	Width  int    `json:"width"`
+	Url    string `json:"url"`
 }
 
 func jsonResponse(err error, tracks []Track) []byte {
@@ -72,22 +72,22 @@ func tracks(t *spotify.Tracks) []Track {
 		for _, image := range item.Album.Images {
 			images = append(images, Image{
 				Height: image.Height,
-				Width: image.Width,
-				Url: image.Url,
+				Width:  image.Width,
+				Url:    image.Url,
 			})
 		}
 		// extract essential track info
 		tracks[i] = Track{
-			Id: item.Id,
-			Name: item.Name,
-			Uri: item.Uri,
+			Id:          item.Id,
+			Name:        item.Name,
+			Uri:         item.Uri,
 			ExternalUrl: item.ExternalUrls.Spotify,
 			Album: Album{
-				Id: item.Album.Id,
-				Name: item.Album.Name,
-				Uri: item.Album.Uri,
+				Id:          item.Album.Id,
+				Name:        item.Album.Name,
+				Uri:         item.Album.Uri,
 				ExternalUrl: item.Album.ExternalUrls.Spotify,
-				Images: images,
+				Images:      images,
 			},
 			Popularity: item.Popularity,
 			PreviewUrl: item.PreviewUrl,
@@ -105,9 +105,9 @@ func GenerateHandler(cfg Config, s spotify.Spotify) func(http.ResponseWriter, *h
 		types := []string{"track"}
 		limit := 10
 		offset := random.RandomInt(spotify.SearchMinOffset, spotify.SearchMaxOffset)
-	
+
 		log.Printf("q: '%v', types: %v, limit: %v, offset: %v\n", query, types, limit, offset)
-	
+
 		res, err := s.Search(query, types, limit, offset)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
